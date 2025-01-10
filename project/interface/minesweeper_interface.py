@@ -31,7 +31,7 @@ class MinesweeperGUI:
     def setup_startup_window(self):
         """ Create the startup window for the game """
         self.start_frame = tk.Frame(self.root, bg="#2c2c2c", padx=20, pady=20)
-        self.start_frame.pack(expand=True)
+        self.start_frame.pack(expand=True)  # center the frame
         self.create_startup_inputs()
         self.create_start_button()
 
@@ -77,7 +77,12 @@ class MinesweeperGUI:
         self.start_button.grid(row=1, column=0, columnspan=6, pady=20)
 
     def start_game(self):
-        """ Start the game with the specified number of rows, columns, and bombs """
+        """
+        Start the game with the specified number of rows, columns, and bombs
+
+        Raises:
+            ValueError: if the input is invalid
+         """
         try:
             rows = int(self.rows_entry.get())
             cols = int(self.cols_entry.get())
@@ -146,7 +151,12 @@ class MinesweeperGUI:
                 self.create_button(row, col)
 
     def create_button(self, row, col):
-        """ Create a button for the game board at the specified row and column """
+        """
+        Create a button for the game board at the specified row and column
+
+        Args:
+            row, col (int): the row and column of the button
+         """
         button = tk.Button(
             self.board_frame,
             text="",
@@ -162,13 +172,24 @@ class MinesweeperGUI:
         self.buttons[row][col] = button
 
     def update_buttons(self, reveal_all_bombs=False):
-        """ Update the text and appearance of all buttons on the game board """
+        """
+        Update the text and appearance of all buttons on the game board
+
+        Args:
+            reveal_all_bombs (bool): whether to reveal all bombs on the board or not
+        """
         for row in range(self.rows):
             for col in range(self.cols):
                 self.update_button(row, col, reveal_all_bombs)
 
     def update_button(self, row, col, reveal_all_bombs):
-        """ Update the text and appearance of the button at the specified row and column """
+        """
+        Update the text and appearance of the button at the specified row and column
+
+        Args:
+            row, col (int): the row and column of the button
+            reveal_all_bombs (bool): whether to reveal all bombs on the board
+        """
         button = self.buttons[row][col]
         if self.game.revealed[row][col]:
             self.set_revealed_button(button, row, col)
@@ -194,7 +215,13 @@ class MinesweeperGUI:
                           disabledforeground="violet")
 
     def set_revealed_button(self, button, row, col):
-        """ Set the appearance of the button at the specified row and column when it is revealed """
+        """
+        Set the appearance of the button at the specified row and column when it is revealed
+
+        Args:
+            button (tk.Button): the button to update
+            row, col (int): the row and column of the button
+        """
         if (row, col) in self.game.bombs:
             button.config(text="💣",
                           bg="white",
@@ -211,7 +238,12 @@ class MinesweeperGUI:
                           relief="sunken")
 
     def reveal_cell(self, row, col):
-        """ Reveal the cell at the specified row and column """
+        """
+        Reveal the cell at the specified row and column
+
+        Args:
+            row, col (int): the row and column of the cell to reveal
+        """
         result = self.game.reveal(row, col)
 
         if result == "BOOM! You hit a bomb. Game Over.":
@@ -223,12 +255,22 @@ class MinesweeperGUI:
                 self.show_game_over(True)
 
     def place_flag(self, row, col):
-        """ Place or remove a flag on the cell at the specified row and column """
+        """
+        Place or remove a flag on the cell at the specified row and column
+
+        Args:
+            row, col (int): the row and column of the cell to place a flag
+        """
         self.game.place_flag(row, col)
         self.update_buttons()
 
     def show_game_over(self, won):
-        """ Show the game over message and disable all buttons """
+        """
+        Show the game over message and disable all buttons
+
+        Args:
+            won (bool): whether the game was won or not
+        """
         if self.timer_id:
             self.root.after_cancel(self.timer_id)
             self.timer_id = None

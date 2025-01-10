@@ -2,7 +2,14 @@ import random
 
 
 def is_neighbor(row, col, exclude):
-    """Check if the cell at (row, col) is a neighbor of the cell at exclude."""
+    """
+    Check if the cell at (row, col) is a neighbor of the cell at exclude
+
+    Args:
+        row, col (int): the row and column of the cell to check
+    Returns:
+        bool: True if the cell at (row, col) is a neighbor of the cell at exclude, False otherwise
+    """
     exclude_r, exclude_col = exclude
     return abs(row - exclude_r) <= 1 and abs(col - exclude_col) <= 1
 
@@ -20,7 +27,12 @@ class MinesweeperLogic:
         self.first_move = True
 
     def place_bombs(self, exclude):
-        """ Place bombs randomly on the board, excluding the cell at exclude """
+        """
+        Places bombs on the board, excluding the cell at exclude
+
+        Args:
+            exclude (tuple): the row and column of the cell to exclude from placing a bomb
+        """
         while len(self.bombs) < self.num_bombs:
             row = random.randint(0, self.rows - 1)
             col = random.randint(0, self.cols - 1)
@@ -39,7 +51,14 @@ class MinesweeperLogic:
                         self.board[neighbour_row][neighbour_col] += 1
 
     def reveal(self, row, col):
-        """ Reveal the cell at (row, col) """
+        """
+        Reveal the cell at (row, col)
+
+        Args:
+            row, col (int): the row and column of the cell to reveal
+        Returns:
+            str: the result of revealing the cell
+        """
         if not self.is_valid_coordinate(row, col):
             return "Invalid coordinates!"
 
@@ -72,7 +91,14 @@ class MinesweeperLogic:
             print()
 
     def place_flag(self, row, col):
-        """ Place or remove a flag on the cell at (row, col) """
+        """
+        Place or remove a flag on the cell at (row, col)
+
+        Args:
+            row, col (int): the row and column of the cell to place a flag
+        Returns:
+            str: the result of placing a flag
+        """
         if not self.is_valid_coordinate(row, col):
             return "Invalid coordinates!"
 
@@ -82,7 +108,14 @@ class MinesweeperLogic:
         self.flags[row][col] = not self.flags[row][col]
 
     def is_valid_coordinate(self, row, col):
-        """ Check if the coordinate (row, col) is valid """
+        """
+        Check if the coordinate (row, col) is valid
+
+        Args:
+            row, col (int): the row and column to check
+        Returns:
+            bool: True if the coordinate is valid, False otherwise
+        """
         return 0 <= row < self.rows and 0 <= col < self.cols
 
     def reveal_all_bombs(self):
@@ -92,7 +125,12 @@ class MinesweeperLogic:
         return "BOOM! You hit a bomb. Game Over."
 
     def reveal_cell(self, row, col):
-        """ Reveal the cell at (row, col) and recursively reveal its neighbors """
+        """
+        Reveal the cell at (row, col) and recursively reveal its neighbors
+
+        Args:
+            row, col (int): the row and column of the cell to reveal
+        """
         if not self.is_valid_coordinate(row, col) or self.revealed[row][col]:
             return
 
