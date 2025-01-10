@@ -2,6 +2,7 @@ import random
 
 
 def is_neighbor(row, col, exclude):
+    """Check if the cell at (row, col) is a neighbor of the cell at exclude."""
     exclude_r, exclude_col = exclude
     return abs(row - exclude_r) <= 1 and abs(col - exclude_col) <= 1
 
@@ -19,13 +20,16 @@ class MinesweeperLogic:
         self.first_move = True
 
     def place_bombs(self, exclude):
+        """ Place bombs randomly on the board, excluding the cell at exclude """
         while len(self.bombs) < self.num_bombs:
             row = random.randint(0, self.rows - 1)
             col = random.randint(0, self.cols - 1)
-            if (row, col) != exclude and (row, col) not in self.bombs and not is_neighbor(row, col, exclude):
+            if ((row, col) != exclude and (row, col) not in self.bombs
+                    and not is_neighbor(row, col, exclude)):
                 self.bombs.add((row, col))
 
     def calculate_numbers(self):
+        """ Calculate the number of bombs adjacent to each cell """
         for row, col in self.bombs:
             for dr in [-1, 0, 1]:
                 for dc in [-1, 0, 1]:
@@ -35,6 +39,7 @@ class MinesweeperLogic:
                         self.board[neighbour_row][neighbour_col] += 1
 
     def reveal(self, row, col):
+        """ Reveal the cell at (row, col) """
         if not self.is_valid_coordinate(row, col):
             return "Invalid coordinates!"
 
@@ -58,15 +63,16 @@ class MinesweeperLogic:
             return self.reveal_all_bombs()
 
         self.reveal_cell(row, col)
-        return None
 
     def print_bombs(self):
+        """ Print the board with bombs """
         for row in range(self.rows):
             for col in range(self.cols):
                 print("B" if (row, col) in self.bombs else "-", end=" ")
             print()
 
     def place_flag(self, row, col):
+        """ Place or remove a flag on the cell at (row, col) """
         if not self.is_valid_coordinate(row, col):
             return "Invalid coordinates!"
 
@@ -74,17 +80,19 @@ class MinesweeperLogic:
             return f"Cell ({row}, {col}) is already revealed! Cannot place a flag."
 
         self.flags[row][col] = not self.flags[row][col]
-        return None
 
     def is_valid_coordinate(self, row, col):
+        """ Check if the coordinate (row, col) is valid """
         return 0 <= row < self.rows and 0 <= col < self.cols
 
     def reveal_all_bombs(self):
-        for r, c in self.bombs:
-            self.revealed[r][c] = True
+        """ Reveal all bombs on the board """
+        for row, col in self.bombs:
+            self.revealed[row][col] = True
         return "BOOM! You hit a bomb. Game Over."
 
     def reveal_cell(self, row, col):
+        """ Reveal the cell at (row, col) and recursively reveal its neighbors """
         if not self.is_valid_coordinate(row, col) or self.revealed[row][col]:
             return
 
@@ -98,42 +106,9 @@ class MinesweeperLogic:
                         self.reveal_cell(neighbour_row, neighbour_col)
 
     def is_won(self):
-        for r in range(self.rows):
-            for c in range(self.cols):
-                if not self.revealed[r][c] and (r, c) not in self.bombs:
+        """ Check if the game is won """
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if not self.revealed[row][col] and (row, col) not in self.bombs:
                     return False
         return True
-
-    def board_state(self):
-        state = []
-        for r in range(self.rows):
-            row = []
-            for c in range(self.cols):
-                if self.revealed[r][c]:
-                    if (r, c) in self.bombs:
-                        row.append("💣")
-                    else:
-                        num = self.board[r][c]
-                        row.append(str(num) if num > 0 else "")
-                elif self.flags[r][c]:
-                    row.append("🚩")
-                else:
-                    row.append("")
-            state.append(row)
-        return state
-
-    def display_board(self):
-        for r in range(self.rows):
-            for c in range(self.cols):
-                if self.revealed[r][c]:
-                    if (r, c) in self.bombs:
-                        print("💣", end=" ")
-                    else:
-                        num = self.board[r][c]
-                        print(num if num > 0 else "", end=" ")
-                elif self.flags[r][c]:
-                    print("🚩", end=" ")
-                else:
-                    print("-", end=" ")
-            print()
-        print()

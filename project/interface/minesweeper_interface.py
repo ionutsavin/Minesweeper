@@ -29,28 +29,43 @@ class MinesweeperGUI:
         self.setup_startup_window()
 
     def setup_startup_window(self):
+        """ Create the startup window for the game """
         self.start_frame = tk.Frame(self.root, bg="#2c2c2c", padx=20, pady=20)
         self.start_frame.pack(expand=True)
         self.create_startup_inputs()
         self.create_start_button()
 
     def create_startup_inputs(self):
-        tk.Label(self.start_frame, text="Rows:", font=("Arial", 12), fg="white", bg="#2c2c2c").grid(row=0, column=0,
-                                                                                                    padx=10, pady=5)
+        """ Create the input fields for the number of rows, columns, and bombs """
+        tk.Label(self.start_frame,
+                 text="Rows:",
+                 font=("Arial", 12),
+                 fg="white",
+                 bg="#2c2c2c"
+                 ).grid(row=0, column=0, padx=10, pady=5)
         self.rows_entry = tk.Entry(self.start_frame, width=5)
         self.rows_entry.grid(row=0, column=1, padx=10, pady=5)
 
-        tk.Label(self.start_frame, text="Columns:", font=("Arial", 12), fg="white", bg="#2c2c2c").grid(row=0, column=2,
-                                                                                                       padx=10, pady=5)
+        tk.Label(self.start_frame,
+                 text="Columns:",
+                 font=("Arial", 12),
+                 fg="white",
+                 bg="#2c2c2c"
+                 ).grid(row=0, column=2, padx=10, pady=5)
         self.cols_entry = tk.Entry(self.start_frame, width=5)
         self.cols_entry.grid(row=0, column=3, padx=10, pady=5)
 
-        tk.Label(self.start_frame, text="Bombs:", font=("Arial", 12), fg="white", bg="#2c2c2c").grid(row=0, column=4,
-                                                                                                     padx=10, pady=5)
+        tk.Label(self.start_frame,
+                 text="Bombs:",
+                 font=("Arial", 12),
+                 fg="white",
+                 bg="#2c2c2c"
+                 ).grid(row=0, column=4, padx=10, pady=5)
         self.bombs_entry = tk.Entry(self.start_frame, width=5)
         self.bombs_entry.grid(row=0, column=5, padx=10, pady=5)
 
     def create_start_button(self):
+        """ Create the button to start the game """
         self.start_button = tk.Button(
             self.start_frame,
             text="Start Game",
@@ -62,6 +77,7 @@ class MinesweeperGUI:
         self.start_button.grid(row=1, column=0, columnspan=6, pady=20)
 
     def start_game(self):
+        """ Start the game with the specified number of rows, columns, and bombs """
         try:
             rows = int(self.rows_entry.get())
             cols = int(self.cols_entry.get())
@@ -92,10 +108,12 @@ class MinesweeperGUI:
             messagebox.showerror("Error", f"Invalid input: {e}")
 
     def create_timer(self):
+        """ Create the timer label to display the remaining time """
         self.timer_label = tk.Label(self.root, font=("Arial", 12), fg="white", bg="#2c2c2c")
         self.timer_label.pack(pady=10)
 
     def update_timer(self):
+        """ Update the timer label with the remaining time """
         minutes, seconds = self.remaining_time // 60, self.remaining_time % 60
         self.timer_label.config(text=f"Time: {minutes}:{seconds:02}")
         if self.remaining_time > 0:
@@ -106,24 +124,29 @@ class MinesweeperGUI:
             self.show_game_over(won=False)
 
     def setup_game_board(self):
+        """ Set up the game board with the specified number of rows, columns, and bombs """
         self.initialize_game_logic()
         self.create_board_frame()
         self.create_board_buttons()
 
     def initialize_game_logic(self):
+        """ Initialize the game logic with the specified number of rows, columns, and bombs """
         self.game = MinesweeperLogic(self.rows, self.cols, self.bombs)
 
     def create_board_frame(self):
+        """ Create the frame to hold the game board buttons """
         self.board_frame = tk.Frame(self.root, bg="#2c2c2c", padx=10, pady=10)
         self.board_frame.pack()
 
     def create_board_buttons(self):
+        """ Create the buttons for the game board """
         self.buttons = [[None for _ in range(self.cols)] for _ in range(self.rows)]
         for row in range(self.rows):
             for col in range(self.cols):
                 self.create_button(row, col)
 
     def create_button(self, row, col):
+        """ Create a button for the game board at the specified row and column """
         button = tk.Button(
             self.board_frame,
             text="",
@@ -134,43 +157,61 @@ class MinesweeperGUI:
             font=("Arial", 12, "bold"),
             command=lambda: self.reveal_cell(row, col),
         )
-        button.bind("<Button-3>", lambda event: self.place_flag(row, col))
+        button.bind("<Button-3>", lambda event: self.place_flag(row, col))  # right click to place flag
         button.grid(row=row, column=col, padx=1, pady=1)
         self.buttons[row][col] = button
 
     def update_buttons(self, reveal_all_bombs=False):
+        """ Update the text and appearance of all buttons on the game board """
         for row in range(self.rows):
             for col in range(self.cols):
                 self.update_button(row, col, reveal_all_bombs)
 
     def update_button(self, row, col, reveal_all_bombs):
+        """ Update the text and appearance of the button at the specified row and column """
         button = self.buttons[row][col]
         if self.game.revealed[row][col]:
             self.set_revealed_button(button, row, col)
         elif self.game.flags[row][col]:
-            button.config(text="🚩", fg="red", bg="#4d4d4d", state="normal", relief="raised", disabledforeground="red")
+            button.config(text="🚩",
+                          fg="red",
+                          bg="#4d4d4d",
+                          state="normal",
+                          relief="raised",
+                          disabledforeground="red")
         else:
-            button.config(text="", bg="#4d4d4d", state="normal", relief="raised")
+            button.config(text="",
+                          bg="#4d4d4d",
+                          state="normal",
+                          relief="raised")
 
         if reveal_all_bombs and (row, col) in self.game.bombs and not self.game.revealed[row][col]:
-            button.config(text="💣", bg="white", fg="violet", state="disabled", relief="sunken",
+            button.config(text="💣",
+                          bg="white",
+                          fg="violet",
+                          state="disabled",
+                          relief="sunken",
                           disabledforeground="violet")
 
     def set_revealed_button(self, button, row, col):
+        """ Set the appearance of the button at the specified row and column when it is revealed """
         if (row, col) in self.game.bombs:
-            button.config(text="💣", bg="white", fg="violet", state="disabled", relief="sunken",
+            button.config(text="💣",
+                          bg="white",
+                          fg="violet",
+                          state="disabled",
+                          relief="sunken",
                           disabledforeground="violet")
         else:
             num = self.game.board[row][col]
-            button.config(
-                text=str(num) if num > 0 else "",
-                fg="black",
-                bg="white",
-                state="disabled",
-                relief="sunken",
-            )
+            button.config(text=str(num) if num > 0 else "",
+                          fg="black",
+                          bg="white",
+                          state="disabled",
+                          relief="sunken")
 
     def reveal_cell(self, row, col):
+        """ Reveal the cell at the specified row and column """
         result = self.game.reveal(row, col)
 
         if result == "BOOM! You hit a bomb. Game Over.":
@@ -178,15 +219,16 @@ class MinesweeperGUI:
             self.show_game_over(False)
         else:
             self.update_buttons()
-
             if self.game.is_won():
                 self.show_game_over(True)
 
     def place_flag(self, row, col):
+        """ Place or remove a flag on the cell at the specified row and column """
         self.game.place_flag(row, col)
         self.update_buttons()
 
     def show_game_over(self, won):
+        """ Show the game over message and disable all buttons """
         if self.timer_id:
             self.root.after_cancel(self.timer_id)
             self.timer_id = None
